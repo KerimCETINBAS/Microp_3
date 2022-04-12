@@ -11,5 +11,9 @@
     "mocha": "^9.2.2",
     "ts-node": "^10.7.0",
     "typescript": "^4.6.3"
+  },
+  "dependencies": {
+    "@types/formidable": "^2.0.4",
+    "formidable": "^2.0.1"
   }
 }

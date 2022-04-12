@@ -1,15 +1,12 @@
 /// <reference types="node" />
 import { EventEmitter } from "events";
 import { Server } from "http";
+import { MicropEndpoint } from "./endpoint";
+import { MicropRequest } from "./request";
 declare type VoidNoParamCallback = () => any;
-export declare type MicropHandler = (request: string) => any;
+export declare type MicropHandler = (request: MicropRequest) => IMicropResponse;
 interface IMicropOptions {
     exposeOverTCP?: boolean;
-}
-interface IMicropStackItem {
-}
-interface IMicropStack {
-    items: IMicropStackItem[];
 }
 export declare enum Methods {
     ANY = "*",
@@ -21,10 +18,14 @@ export declare enum Methods {
     HEAD = "HEAD",
     OPTIONS = "OPTIONS"
 }
+export interface IMicropResponse {
+    status?: number;
+    header?: Record<string, string>;
+    locals?: Record<string, unknown>;
+    body?: string | Record<string, unknown> | Uint16Array | Buffer;
+}
 declare abstract class AMicropApp extends EventEmitter {
     protected _server: Server;
-    abstract use(handler: MicropHandler | MicropHandler[]): this;
-    abstract use(path: string, handler: MicropHandler | MicropHandler[]): this;
     abstract use(path: string | MicropHandler | MicropHandler[], handler?: MicropHandler | MicropHandler[]): this;
     abstract get(method: MicropHandler): this;
     abstract get(method: MicropHandler, ...rest: MicropHandler[]): this;
@@ -46,62 +47,54 @@ declare abstract class AMicropApp extends EventEmitter {
     abstract delete(method: MicropHandler, ...rest: MicropHandler[]): this;
     abstract delete(path: string, method: MicropHandler): this;
     abstract delete(path: string, method: MicropHandler, ...rest: MicropHandler[]): this;
+    abstract head(method: MicropHandler): this;
+    abstract head(method: MicropHandler, ...rest: MicropHandler[]): this;
+    abstract head(path: string, method: MicropHandler): this;
+    abstract head(path: string, method: MicropHandler, ...rest: MicropHandler[]): this;
+    abstract options(method: MicropHandler): this;
+    abstract options(method: MicropHandler, ...rest: MicropHandler[]): this;
+    abstract options(path: string, method: MicropHandler): this;
+    abstract options(path: string, method: MicropHandler, ...rest: MicropHandler[]): this;
     abstract listen(port: number, callback?: VoidNoParamCallback): this;
 }
-export declare class Microp extends AMicropApp implements IMicropOptions, IMicropStack {
+export declare class Microp extends AMicropApp implements IMicropOptions {
     readonly exposeOverTCP: boolean;
-    private _items;
+    private _stack;
     private _listening;
     constructor(options?: IMicropOptions);
-    get listening(): boolean;
-    get items(): IMicropStackItem[];
-    use(handler: MicropHandler[] | MicropHandler): this;
-    use(path: string | MicropHandler | MicropHandler[], handler: MicropHandler | MicropHandler[]): this;
-    /**
-     * @description
-     * @param {MicropHandler} method
-     * @returns {Microp}
-     */
-    get(method: MicropHandler): this;
-    get(method: MicropHandler, ...rest: MicropHandler[]): this;
-    get(path: string, method: MicropHandler): this;
-    get(path: string, method: MicropHandler, ...rest: MicropHandler[]): this;
-    /**
-   * @description Register an endpoint for HTTP GET request
-   * @param {MicropHandler} method
-   * @returns {Microp}
-   */
-    post(method: MicropHandler): this;
-    post(method: MicropHandler, ...rest: MicropHandler[]): this;
-    post(path: string, method: MicropHandler): this;
-    post(path: string, method: MicropHandler, ...rest: MicropHandler[]): this;
-    /**
-    *
-    * @param {MicropHandler} method
-    * @returns {Microp}
-    */
-    put(method: MicropHandler): this;
-    put(method: MicropHandler, ...rest: MicropHandler[]): this;
-    put(path: string, method: MicropHandler): this;
-    put(path: string, method: MicropHandler, ...rest: MicropHandler[]): this;
-    /**
-     *
-     * @param {MicropHandler} method
-     * @returns {Microp}
-     */
-    patch(method: MicropHandler): this;
-    patch(method: MicropHandler, ...rest: MicropHandler[]): this;
-    patch(path: string, method: MicropHandler): this;
-    patch(path: string, method: MicropHandler, ...rest: MicropHandler[]): this;
-    /**
-     *
-     * @param {MicropHandler} method
-     * @returns {Microp}
-     */
-    delete(method: MicropHandler): this;
-    delete(method: MicropHandler, ...rest: MicropHandler[]): this;
-    delete(path: string, method: MicropHandler): this;
-    delete(path: string, method: MicropHandler, ...rest: MicropHandler[]): this;
+    get stack(): MicropEndpoint[];
+    use(handler: MicropHandler): this;
+    use(handler: MicropHandler[]): this;
+    use(path: string, handler: MicropHandler): this;
+    use(path: string, handler: MicropHandler[]): this;
+    get(handler: MicropHandler): this;
+    get(handler: MicropHandler[]): this;
+    get(path: string, handler: MicropHandler): this;
+    get(path: string, handler: MicropHandler[]): this;
+    post(handler: MicropHandler): this;
+    post(handler: MicropHandler[]): this;
+    post(path: string, handler: MicropHandler): this;
+    post(path: string, handler: MicropHandler[]): this;
+    put(handler: MicropHandler): this;
+    put(handler: MicropHandler[]): this;
+    put(path: string, handler: MicropHandler): this;
+    put(path: string, handler: MicropHandler[]): this;
+    patch(handler: MicropHandler): this;
+    patch(handler: MicropHandler[]): this;
+    patch(path: string, handler: MicropHandler): this;
+    patch(path: string, handler: MicropHandler[]): this;
+    delete(handler: MicropHandler): this;
+    delete(handler: MicropHandler[]): this;
+    delete(path: string, handler: MicropHandler): this;
+    delete(path: string, handler: MicropHandler[]): this;
+    head(handler: MicropHandler): this;
+    head(handler: MicropHandler[]): this;
+    head(path: string, handler: MicropHandler): this;
+    head(path: string, handler: MicropHandler[]): this;
+    options(handler: MicropHandler): this;
+    options(handler: MicropHandler[]): this;
+    options(path: string, handler: MicropHandler): this;
+    options(path: string, handler: MicropHandler[]): this;
     listen(port: number, callback?: VoidNoParamCallback): this;
 }
 export {};

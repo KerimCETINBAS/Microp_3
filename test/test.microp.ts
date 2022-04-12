@@ -20,16 +20,6 @@ describe("\"Microp app\"", () => {
         const app = new Microp({ exposeOverTCP: true })
         expect(app.exposeOverTCP).to.equal(true)
     })
-
-    it("Microp app methods must return instances of the app" , async ()=> {
-  
-       const app = new Microp({}).get( async ()=> {
-          
-            expect(app).to.instanceof(Microp)
-            
-        })
-       
-    })
     
 
 })

@@ -1,26 +1,21 @@
 import { EventEmitter } from "events"
-import { createServer, Server } from "http";
-import { Func } from "mocha";
-import { stringify } from "querystring";
-import { validateEndpointParam } from "../util";
+import { createServer, IncomingMessage, Server, ServerResponse } from "http";
+
+import { createEndpoint, setParams, validateEndpointParam } from "../util";
 import { MicropEndpointError } from "../util/error";
-import { Endpoint } from "./endpoint";
+import { MicropEndpoint } from "./endpoint";
+import micropListener from "./micropListener";
+import { MicropRequest } from "./request";
 
 
 
 type VoidNoParamCallback = () => any
-export type  MicropHandler = (request: string) => any
+export type  MicropHandler = (request: MicropRequest) => IMicropResponse
 interface IMicropOptions {
     exposeOverTCP?: boolean;
 }
 
-interface IMicropStackItem {
 
-}
-
-interface IMicropStack {
-    items: IMicropStackItem[]
-}
 
 export enum Methods {
     ANY = "*",
@@ -33,20 +28,22 @@ export enum Methods {
     OPTIONS = "OPTIONS"
 }
 
+export interface IMicropResponse {
+    status?: number
+    header?:Record<string,string>
+    locals?:Record<string,unknown>
+    body?: string | Record<string,unknown> | Uint16Array | Buffer
+    
+}
+
 abstract class AMicropApp extends EventEmitter {
     
     protected _server: Server = createServer()
-
-    abstract use(handler:MicropHandler | MicropHandler[]): this
-    abstract use(path:string, handler:MicropHandler|MicropHandler[]): this
     abstract use(path:string | MicropHandler | MicropHandler[], handler?:MicropHandler|MicropHandler[]): this
-
-
     abstract get(method:MicropHandler): this
     abstract get(method:MicropHandler, ...rest:MicropHandler[]): this
     abstract get(path:string, method:MicropHandler): this
     abstract get(path:string, method:MicropHandler,...rest:MicropHandler[]): this
-
 
     abstract post(method:MicropHandler): this
     abstract post(method:MicropHandler, ...rest:MicropHandler[]): this
@@ -68,125 +65,128 @@ abstract class AMicropApp extends EventEmitter {
     abstract delete(path:string, method:MicropHandler): this
     abstract delete(path:string, method:MicropHandler,...rest:MicropHandler[]): this
 
-    // TODO
-    /* abstract head(method:MicropMethod): this
-    abstract head(method:MicropMethod, ...rest:MicropMethod[]): this
-    abstract head(path:string, method:MicropMethod): this
-    abstract head(path:string, method:MicropMethod,...rest:MicropMethod[]): this
+    abstract head(method:MicropHandler): this
+    abstract head(method:MicropHandler, ...rest:MicropHandler[]): this
+    abstract head(path:string, method:MicropHandler): this
+    abstract head(path:string, method:MicropHandler,...rest:MicropHandler[]): this
 
-
-    abstract options(method:MicropMethod): this
-    abstract options(method:MicropMethod, ...rest:MicropMethod[]): this
-    abstract options(path:string, method:MicropMethod): this
-    abstract options(path:string, method:MicropMethod,...rest:MicropMethod[]): this */
+    abstract options(method:MicropHandler): this
+    abstract options(method:MicropHandler, ...rest:MicropHandler[]): this
+    abstract options(path:string, method:MicropHandler): this
+    abstract options(path:string, method:MicropHandler,...rest:MicropHandler[]): this
 
     abstract listen(port: number, callback?: VoidNoParamCallback): this
 }
 
 
 
-export class Microp extends AMicropApp implements IMicropOptions, IMicropStack {
+export class Microp extends AMicropApp implements IMicropOptions {
 
     readonly exposeOverTCP: boolean
-    private _items: IMicropStackItem[] = []
+    private _stack: MicropEndpoint[] = []
     private _listening: boolean = false;
     
-    constructor(options?: IMicropOptions) {
-        super()
-
+    constructor(options?: IMicropOptions) { 
+        super() 
         this.exposeOverTCP = options?.exposeOverTCP ? options?.exposeOverTCP : false
-    }
+        this._server.on("request", 
+            (req:IncomingMessage, res:ServerResponse) => 
+            micropListener(req,res, this._stack))
+        }
     
-    get listening(): boolean {
-        return this._listening
-    }
+  
     // allow users get stack but do not let manuplate   
-    get items(): IMicropStackItem[] {
-        return this._items
+    get stack(): MicropEndpoint[] {
+        return this._stack
     } 
 
 
-    use(handler: MicropHandler[] | MicropHandler): this;
-    use(path: string | MicropHandler | MicropHandler[], handler: MicropHandler | MicropHandler[]): this;
+    use(handler:MicropHandler): this
+    use(handler:MicropHandler[]): this
+    use(path:string, handler:MicropHandler): this
+    use(path: string,handler:MicropHandler[]):this
     use(path: string | MicropHandler | MicropHandler[], handler?:MicropHandler | MicropHandler[]): this {
-
-
-        const Endpoints: Endpoint[] = []
-
-        console.log(typeof handler !== "undefined")
-        if(typeof path !== "string") {
-            // handler
-        }
-        if(typeof path !== "string" && typeof handler !== "undefined") {
-            console.log("multiple handler")
-        }
+        const stack = createEndpoint(Methods.ANY, path, handler)
+        this._stack = this._stack.concat(stack)
         return this
     }
  
-    /**
-     * @description
-     * @param {MicropHandler} method 
-     * @returns {Microp} 
-     */
-    get(method: MicropHandler): this
-    get(method: MicropHandler, ...rest: MicropHandler[]): this
-    get(path: string, method: MicropHandler): this
-    get(path: string, method: MicropHandler, ...rest: MicropHandler[]): this
-    get(path: any, method?: any, ...rest: any[]): this {
-        
+    
+    get(handler:MicropHandler): this
+    get(handler:MicropHandler[]): this
+    get(path:string, handler:MicropHandler): this
+    get(path: string,handler:MicropHandler[]):this
+    get(path: string | MicropHandler | MicropHandler[], handler?:MicropHandler | MicropHandler[]): this {
+        const stack = createEndpoint(Methods.GET, path, handler)
+        this._stack = this._stack.concat(stack)
         return this
     }
 
-      /**
-     * @description Register an endpoint for HTTP GET request
-     * @param {MicropHandler} method 
-     * @returns {Microp} 
-     */
-    post(method: MicropHandler): this
-    post(method: MicropHandler, ...rest: MicropHandler[]): this
-    post(path: string, method: MicropHandler): this
-    post(path: string, method: MicropHandler, ...rest: MicropHandler[]): this
-    post(path: any, method?: any, ...rest: any[]): this {
+    
+    post(handler:MicropHandler): this
+    post(handler:MicropHandler[]): this
+    post(path:string, handler:MicropHandler): this
+    post(path: string,handler:MicropHandler[]):this
+    post(path: string | MicropHandler | MicropHandler[], handler?:MicropHandler | MicropHandler[]): this {
+        const stack = createEndpoint(Methods.POST, path, handler)
+        this._stack = this._stack.concat(stack)
         return this
     }
-     /**
-     * 
-     * @param {MicropHandler} method 
-     * @returns {Microp} 
-     */
-    put(method: MicropHandler): this
-    put(method: MicropHandler, ...rest: MicropHandler[]): this
-    put(path: string, method: MicropHandler): this
-    put(path: string, method: MicropHandler, ...rest: MicropHandler[]): this
-    put(path: any, method?: any, ...rest: any[]): this {
+   
+    put(handler:MicropHandler): this
+    put(handler:MicropHandler[]): this
+    put(path:string, handler:MicropHandler): this
+    put(path: string,handler:MicropHandler[]):this
+    put(path: string | MicropHandler | MicropHandler[], handler?:MicropHandler | MicropHandler[]): this {
+        const stack = createEndpoint(Methods.PUT, path, handler)
+        this._stack = this._stack.concat(stack)
+        return this
+    }
+    
+    patch(handler:MicropHandler): this
+    patch(handler:MicropHandler[]): this
+    patch(path:string, handler:MicropHandler): this
+    patch(path: string,handler:MicropHandler[]):this
+    patch(path: string | MicropHandler | MicropHandler[], handler?:MicropHandler | MicropHandler[]): this {
+        const stack = createEndpoint(Methods.PATCH, path, handler)
+        this._stack = this._stack.concat(stack)
+        return this
+    }
+   
+    delete(handler:MicropHandler): this
+    delete(handler:MicropHandler[]): this
+    delete(path:string, handler:MicropHandler): this
+    delete(path: string,handler:MicropHandler[]):this
+    delete(path: string | MicropHandler | MicropHandler[], handler?:MicropHandler | MicropHandler[]): this {
+        const stack = createEndpoint(Methods.DELETE, path, handler)
+        this._stack = this._stack.concat(stack)
+        return this
+    }
 
+
+     
+    head(handler:MicropHandler): this
+    head(handler:MicropHandler[]): this
+    head(path:string, handler:MicropHandler): this
+    head(path: string,handler:MicropHandler[]):this
+    head(path: string | MicropHandler | MicropHandler[], handler?:MicropHandler | MicropHandler[]): this {
+        const stack = createEndpoint(Methods.HEAD, path, handler)
+        this._stack = this._stack.concat(stack)
         return this
     }
-    /**
-     * 
-     * @param {MicropHandler} method 
-     * @returns {Microp} 
-     */
-    patch(method: MicropHandler): this
-    patch(method: MicropHandler, ...rest: MicropHandler[]): this
-    patch(path: string, method: MicropHandler): this
-    patch(path: string, method: MicropHandler, ...rest: MicropHandler[]): this
-    patch(path: any, method?: any, ...rest: any[]): this {
-        return this
+
+
+
+
+    options(handler:MicropHandler): this
+    options(handler:MicropHandler[]): this
+    options(path:string, handler:MicropHandler): this
+    options(path: string,handler:MicropHandler[]):this
+    options(path: string | MicropHandler | MicropHandler[], handler?:MicropHandler | MicropHandler[]): this {
+        const stack = createEndpoint(Methods.OPTIONS, path, handler)
+        this._stack = this._stack.concat(stack)
+        return this   
     }
-    /**
-     * 
-     * @param {MicropHandler} method 
-     * @returns {Microp} 
-     */
-    delete(method: MicropHandler): this
-    delete(method: MicropHandler, ...rest: MicropHandler[]): this
-    delete(path: string, method: MicropHandler): this
-    delete(path: string, method: MicropHandler, ...rest: MicropHandler[]): this
-    delete(path: any, method?: any, ...rest: any[]): this {
-        return this
-    }
-  
 
     listen(port: number, callback?: VoidNoParamCallback): this {
        
