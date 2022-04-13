@@ -1,15 +1,12 @@
-const { Microp } = require("../lib/index")
+const { Microp, MicropRouter } = require("../lib/index")
 const os = require("os")
+
+
+console.log(MicropRouter)
 
 const PORT = process.env.PORT || 3000
 const app = new Microp()
 
-const hasFile = async (req) => {
-    const body = !!Object.values(await req.body({multiples: true})).find(x => x.isFile == true)
-    return {
-        locals: { hasFile: body  }
-    }
-}
 
 const handler = async (req) => {
     // promise yerine request bittikten sonra endpoint calisabilir
@@ -25,8 +22,9 @@ const handler = async (req) => {
 }
 
 
-app.use("/user/upload", [hasFile, handler])
+//const userRouter = new MicropRouter()
 
-app.delete(PORT, ()=> console.info(`Server listening on :::${PORT}`)) 
+app.use("/user",handler)
+
 
 app.listen(3000)

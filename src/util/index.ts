@@ -1,6 +1,7 @@
-import { Methods, Microp, MicropHandler } from "../microp/app"
+import { MicropRouter } from "../router"
 import { MicropEndpoint } from "../microp/endpoint"
 
+import { Methods, MicropHandler  } from "../core/types"
 /**
  * @description create regexp from route path, on request compare with requested url regexp.test(req.url)
  * @param {string} path 
@@ -18,7 +19,7 @@ import { MicropEndpoint } from "../microp/endpoint"
  *            
  * @param {string} path
  * @returns {Record<string, number>}
- */
+ */ 
  export const createParams = (path: string) : Record<string, unknown > => {
     const segments = path.trim().split("/").filter(t => t != "")
     const params = segments.map((segment, index)=> {
@@ -51,14 +52,22 @@ export const createEndpoint =
     (method: Methods, path: string |  MicropHandler | MicropHandler[], 
     handler?: MicropHandler | MicropHandler[]) : MicropEndpoint[] =>  {
 
-        const endpoints: MicropEndpoint[] = []
         
-        if(Array.isArray(path) && typeof handler !== undefined) {
+        
+        const endpoints: MicropEndpoint[] = []
+        console.log("router", MicropRouter)
+        if( path instanceof MicropRouter) {
+            // handler router
+
+            console.log("router")
+        }
+        else if(Array.isArray(path) && typeof handler !== undefined) {
             if(!(path.length > 0)) throw new Error("registering endpoint without handler")
             // multiple handler without path
 
           
             for(const _handler of path) {
+                
                 endpoints.push(new MicropEndpoint(Methods.ANY, "/", _handler))
             }
         }
@@ -67,6 +76,10 @@ export const createEndpoint =
             endpoints.push(new MicropEndpoint(Methods.ANY, "/", <MicropHandler>handler))
          
         }
+      /*   else if(typeof path === 'string' && handler instanceof MicropRouter) {
+            // handler router
+            console.log("router")
+        } */
         else if(typeof path === 'string' && typeof handler == "function") {
             //single handler "with" path
 
@@ -93,12 +106,3 @@ export const createEndpoint =
         return endpoints
 }
 
-
-export const validateEndpointParam = (param: MicropHandler | MicropHandler[] | undefined) : boolean => {
-
-
-    if(param instanceof <MicropHandler>Array) {
-        
-    }
-    return true
-}

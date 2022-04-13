@@ -1,4 +1,4 @@
-import { Methods, MicropHandler } from "./app";
+import { MicropHandler, Methods } from "../core/types";
 export declare class MicropEndpoint {
     readonly path: string;
     readonly method: Methods;

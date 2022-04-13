@@ -1,5 +1,6 @@
+
+import { MicropHandler, Methods } from "../core/types";
 import { createParams, createRegexpUrl } from "../util";
-import { Methods, MicropHandler } from "./app";
 
 export class MicropEndpoint {
 

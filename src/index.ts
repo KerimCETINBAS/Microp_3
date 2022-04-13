@@ -1,9 +1,10 @@
 import { Microp } from "./microp/app";
+import { MicropRouter } from "./router";
+
+export { Microp } from "./microp/app";
+export { MicropRouter } from "./router";
 
 
-export { Microp }
-export default { Microp }
 
 
-
-module.exports = {Microp } 
+module.exports = { Microp, MicropRouter}

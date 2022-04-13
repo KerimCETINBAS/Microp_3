@@ -1,7 +1,3 @@
-import { Microp } from "./microp/app";
-export { Microp };
-declare const _default: {
-    Microp: typeof Microp;
-};
-export default _default;
+export { Microp } from "./microp/app";
+export { MicropRouter } from "./router";
 //# sourceMappingURL=index.d.ts.map

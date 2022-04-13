@@ -15,5 +15,9 @@
   "dependencies": {
     "@types/formidable": "^2.0.4",
     "formidable": "^2.0.1"
+  },  
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KerimCETINBAS/Microp_3.git"
   }
 }

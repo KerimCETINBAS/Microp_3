@@ -1,4 +1,4 @@
-import { Methods } from "../microp/app";
+import { Methods } from "../core/types";
 
 export class MicropEndpointError extends Error {
 
