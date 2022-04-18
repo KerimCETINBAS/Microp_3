@@ -8,11 +8,6 @@ import micropListener from "./micropListener";
 
 
 
-interface IMicropOptions {
-    exposeOverTCP?: boolean;
-}
-
-
 
 
 

@@ -1,17 +1,17 @@
-import MicropCore  from "../core";
+import { RouterCore } from "../core/index";
 
-console.log("router und ",MicropCore)
+
+
+console.log(RouterCore)
+
 export class MicropRouter {
 
     
-    
-    /*     constructor() {
-            super()
+        constructor() {
+         
         }
-     
     
-        get stack(): MicropEndpoint[] {
-            return this._stack
-        } */
-    
+       
 }
+
+new MicropRouter()

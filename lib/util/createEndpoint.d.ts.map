@@ -1,0 +1,1 @@
+{"version":3,"file":"createEndpoint.d.ts","sourceRoot":"","sources":["../../src/util/createEndpoint.ts"],"names":[],"mappings":"AAAA,OAAO,EAAW,aAAa,EAAE,MAAM,eAAe,CAAA;AACtD,OAAO,EAAE,cAAc,EAAE,MAAM,oBAAoB,CAAA;AAGnD,eAAO,MAAM,cAAc,0BACH,MAAM,GAAI,aAAa,GAAG,aAAa,EAAE,YACvD,aAAa,GAAG,aAAa,EAAE,KAAI,cAAc,EAsD1D,CAAA"}
