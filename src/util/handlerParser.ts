@@ -17,12 +17,9 @@ export default (method: method, path: string | MicropHandler | MicropHandler[] |
     else { 
         if(path instanceof MicropRouter) return path.Stack
         else if(path instanceof MicropMiddleware) {
-            
-            
             return createStack(method,  mPath + "*", [path])
         }
         else if(typeof path == "object") {
-
             // array
             return createStack(method,  mPath + "*", path as Array<MicropHandler | MicropMiddleware>)
         }

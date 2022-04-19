@@ -7,6 +7,7 @@ import handlerParser from "../util/handlerParser";
 
 export interface StackItem {
     regexp: RegExp
+    method: Methods
     params: Record<string,unknown>
     endpointPath: string
     handlers:Array<MicropHandler|MicropMiddleware>
@@ -17,14 +18,14 @@ export interface MiddleWareStackItem {
 
 
 export enum Methods {
-    ALL,
-    GET,
-    POST,
-    PUT,
-    PATCH,
-    DELETE,
-    HEAD,
-    OPTIONS
+    ALL = "ALL",
+    GET = "GET",
+    POST = "POST",
+    PUT = "PUT",
+    PATCH = "PATCH",
+    DELETE = "DELETE",
+    HEAD = "HEAD",
+    OPTIONS = "OPTIONS"
 }
 
 export class MicropCore extends EventEmitter {
@@ -49,7 +50,7 @@ export class MicropCore extends EventEmitter {
     get(path: string ,handler: MicropHandler | MicropHandler[] | MicropRouter | MicropMiddleware):this
     get(path: string | MicropHandler | MicropHandler[] | MicropRouter| MicropMiddleware ,handler?: MicropHandler | MicropHandler[] | MicropRouter | MicropMiddleware ):this {
 
-        this._stack.push(...handlerParser(Methods.GET, path, handler))
+        this._stack.push(...handlerParser(Methods.GET, path, handler, this._path || ""))
         return this;
     }
 
@@ -57,7 +58,7 @@ export class MicropCore extends EventEmitter {
     post(path: string ,handler: MicropHandler | MicropHandler[] | MicropRouter | MicropMiddleware):this
     post(path: string | MicropHandler | MicropHandler[] | MicropRouter| MicropMiddleware ,handler?: MicropHandler | MicropHandler[] | MicropRouter | MicropMiddleware ):this {
 
-        this._stack.push(...handlerParser(Methods.POST, path, handler))
+        this._stack.push(...handlerParser(Methods.POST, path, handler, this._path || ""))
         return this;
     }
 
@@ -65,7 +66,7 @@ export class MicropCore extends EventEmitter {
     put(path: string ,handler: MicropHandler | MicropHandler[] | MicropRouter | MicropMiddleware):this
     put(path: string | MicropHandler | MicropHandler[] | MicropRouter| MicropMiddleware ,handler?: MicropHandler | MicropHandler[] | MicropRouter | MicropMiddleware ):this {
 
-        this._stack.push(...handlerParser(Methods.PUT, path, handler))
+        this._stack.push(...handlerParser(Methods.PUT, path, handler, this._path || ""))
         return this;
     }
 
@@ -73,7 +74,7 @@ export class MicropCore extends EventEmitter {
     patch(path: string ,handler: MicropHandler | MicropHandler[] | MicropRouter | MicropMiddleware):this
     patch(path: string | MicropHandler | MicropHandler[] | MicropRouter| MicropMiddleware ,handler?: MicropHandler | MicropHandler[] | MicropRouter | MicropMiddleware ):this {
 
-        this._stack.push(...handlerParser(Methods.PATCH, path, handler))
+        this._stack.push(...handlerParser(Methods.PATCH, path, handler, this._path || ""))
         return this;
     }
 
@@ -82,7 +83,7 @@ export class MicropCore extends EventEmitter {
     delete(path: string | MicropHandler | MicropHandler[] | MicropRouter| MicropMiddleware ,handler?: MicropHandler | MicropHandler[] | MicropRouter | MicropMiddleware ):this {
 
        
-        this._stack.push(...handlerParser(Methods.DELETE, path, handler))
+        this._stack.push(...handlerParser(Methods.DELETE, path, handler, this._path || ""))
         return this;
     }
 
@@ -90,7 +91,7 @@ export class MicropCore extends EventEmitter {
     head(path: string ,handler: MicropHandler | MicropHandler[] | MicropRouter | MicropMiddleware):this
     head(path: string | MicropHandler | MicropHandler[] | MicropRouter| MicropMiddleware ,handler?: MicropHandler | MicropHandler[] | MicropRouter | MicropMiddleware ):this {
 
-        this._stack.push(...handlerParser(Methods.HEAD, path, handler))
+        this._stack.push(...handlerParser(Methods.HEAD, path, handler, this._path || ""))
         return this;
     }
 
@@ -99,7 +100,7 @@ export class MicropCore extends EventEmitter {
     options(path: string | MicropHandler | MicropHandler[] | MicropRouter| MicropMiddleware ,handler?: MicropHandler | MicropHandler[] | MicropRouter | MicropMiddleware ):this {
 
        
-        this._stack.push(...handlerParser(Methods.OPTIONS, path, handler))
+        this._stack.push(...handlerParser(Methods.OPTIONS, path, handler, this._path || ""))
         return this;
     }
 

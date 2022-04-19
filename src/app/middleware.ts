@@ -1,4 +1,4 @@
-import { StackItem } from "../core/core"
+import { Methods, StackItem } from "../core/core"
 import { MicropHandler } from "./microp"
 
 export class MicropMiddleware  {
@@ -8,6 +8,7 @@ export class MicropMiddleware  {
     regexp: RegExp = new RegExp("")
     params: Record<string, unknown> = {}
     endpointPath: string = ""
+    method: Methods = Methods.ALL
     handlers: Array<MicropHandler>= []
     handler
     constructor(handler: (req:any, res:any, next?: (error?:string)=>void)=>void) {

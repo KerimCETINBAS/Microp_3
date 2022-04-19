@@ -6,17 +6,15 @@ import { MicropMiddleware } from "../app/middleware";
 
 const createParams = (path: string) => {
 
-    return {}
+    const segments = path.split("/").filter(s => s !== "").reduce((t,c,i)=> {
+         if(/^:/.test(c)) return {...t, [c.replace(/^:/,"")]: i}
+         return t  }, {})
+    return segments
 }
-
-
-
-
 export default (
     method: Methods, 
     path: string,  
     handlers: Array<MicropHandler|MicropMiddleware> ): StackItem[] => {
-  
     let regexp: RegExp
     let params: Record<string, unknown> = {}
 
@@ -25,20 +23,13 @@ export default (
         regexp = createRegexpUrl(path),
         params = createParams(path)
     }
- 
-
-    
-    
     const stack: StackItem = {
         regexp,
         params,
+        method,
         handlers,
         endpointPath: path
     }
 
     return [stack]
-   
-  
-    
-    
 }

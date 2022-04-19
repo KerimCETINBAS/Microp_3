@@ -14,12 +14,13 @@ const fakehandler = async (req) => {
 
 //const userRouter = new MicropRouter()
 
-app.use("/user", fakehandler)
-app.use("/user", [fakehandler, request=> {
+app.get("/user/:id", fakehandler)
+app.get("/user/:id", [fakehandler, async  request=> {
 
+    const {firstName, lastName } = await request.body()
     return {
         body: {
-            name: "jdoe"
+            fullname: firstName + " " + lastName
         }
     }
 }])
