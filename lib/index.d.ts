@@ -1,3 +1,3 @@
-export { Microp } from "./microp/app";
-export { MicropRouter } from "./router";
+export { Microp } from "./app";
+export { MicropRouter } from "./app/router";
 //# sourceMappingURL=index.d.ts.map

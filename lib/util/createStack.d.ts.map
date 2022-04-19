@@ -1,0 +1,1 @@
+{"version":3,"file":"createStack.d.ts","sourceRoot":"","sources":["../../src/util/createStack.ts"],"names":[],"mappings":"AAAA,OAAO,EAAmB,aAAa,EAAE,MAAM,QAAQ,CAAC;AAExD,OAAO,EAAE,OAAO,EAAE,SAAS,EAAE,MAAM,SAAS,CAAC;AAC7C,OAAO,EAAE,gBAAgB,EAAE,MAAM,mBAAmB,CAAC;iCAYzC,OAAO,QACT,MAAM,YACF,MAAM,aAAa,GAAC,gBAAgB,CAAC,KAAI,SAAS,EAAE;AAHlE,wBA6BC"}
