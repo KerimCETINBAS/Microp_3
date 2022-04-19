@@ -1,13 +1,19 @@
 import {EventEmitter} from "events";
-import { StackItem } from ".";
 import {  MicropRouter} from "..";
 import { MicropHandler } from "../app";
 import { MicropMiddleware } from "../app/middleware";
-import { createStack } from "../util";
+import { default as createStack } from "../util/createStack";
 import handlerParser from "../util/handlerParser";
-import { MiddleWareStackItem } from "./stacks";
 
+export interface StackItem {
+    regexp: RegExp
+    params: Record<string,unknown>
+    endpointPath: string
+    handlers:Array<MicropHandler|MicropMiddleware>
+}
+export interface MiddleWareStackItem {
 
+}
 
 
 export enum Methods {

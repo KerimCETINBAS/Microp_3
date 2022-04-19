@@ -1,6 +1,6 @@
 import { IncomingMessage, Server, ServerResponse } from "http";
 import { isTypedArray } from "util/types";
-import Core = require("../core");
+import Core = require("../core/core");
 import { MicropBody } from "../core/micropBody";
 import { MicropMiddleware } from "./middleware";
 export interface MicropResponse {
@@ -50,7 +50,6 @@ export class Microp  extends Core.MicropCore {
                             Object.entries(response?.headers || {}).forEach(([index, key]: [string, string]) => { 
                                 res.setHeader(index, key) })
                             if(!response?.body && !response?.status ) {
-                                console.log("no body and status" )
                                 Object.assign(request.locals, response?.locals || {})
                             }
                             else {

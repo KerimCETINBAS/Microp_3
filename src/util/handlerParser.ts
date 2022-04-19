@@ -1,7 +1,7 @@
-import { createStack } from ".";
+import { default as createStack } from "./createStack";
 import { MicropHandler, MicropRouter } from "../app";
 import { MicropMiddleware } from "../app/middleware";
-import { Methods as method, StackItem } from "../core";
+import { Methods as method, StackItem } from "../core/core";
 
 export default (method: method, path: string | MicropHandler | MicropHandler[] | MicropRouter| MicropMiddleware ,handler?: MicropHandler | MicropHandler[] | MicropRouter | MicropMiddleware, mPath?: string): StackItem[] => {
     if(typeof path == "string") {

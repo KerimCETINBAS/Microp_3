@@ -1,4 +1,4 @@
-import { StackItem } from "../core"
+import { StackItem } from "../core/core"
 import { MicropHandler } from "./microp"
 
 export class MicropMiddleware  {
